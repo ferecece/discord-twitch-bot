@@ -1,0 +1,25 @@
+const { Events } = require("discord.js");
+const { queryGame } = require("../api/games.js");
+const { getChannelsWithNames } = require('../api/channels.js');
+const { getStreams } = require('../api/streams.js');
+const { twitchClientId, twitchSecret } = require("../config.json");
+
+module.exports = {
+  name: Events.MessageCreate,
+  async execute(msg) {
+    if (msg.author.bot) return;
+    const result = await getStreams(msg.content.split(' '), twitchClientId, twitchSecret);
+    await msg.channel.send({
+      content: "```" + JSON.stringify(result, null, "\t") + "```",
+    });
+    /*
+        const serverData = await streamers.get(msg.guild.id);
+        if (!serverData.canalStream) return;
+        const webhooks = await msg.channel.fetchWebhooks();
+        let webhook = webhooks.find(wh => (wh.channelId == serverData.canalStream && wh.token));
+        if (!webhook) return;
+        if (msg.author.id == webhook.id) return;
+        if (msg.channel.id == serverData.canalStream) return await msg.delete();
+        */
+  },
+};
